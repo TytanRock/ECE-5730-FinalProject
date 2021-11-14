@@ -334,3 +334,6 @@ TSWLatexianTemp*
 
 # don't ignore actual jpg files inside our images directory
 !**/Images/*.jpg
+
+# Ignore Word temporary files
+~*.docx
