@@ -81,7 +81,21 @@
 #include "sys/alt_stdio.h"
 #include "stdlib.h"
 
+#define PIO_INPUT_ADDR (0x5000) // Change to match the input address of the PIO in the designer
+#define PIO_NEXT_NUM_ADDR (0x5020)
+#define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_BASE_ADDR)
+#define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
 
+/**
+ * @brief Adds to matrices together
+ * 
+ * @param a First matrix to add
+ * @param b Second matrix to add
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
 void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 {
 	int i,j,k,l;
@@ -250,13 +264,17 @@ int main()
   while(1)
   {
 	  //reading row and column size for matrix A and B
-       RD_VAL=(int *)0x00011010; // base address need to be changed for every read operation?
+	  // Read the row, column size of matrix 1 and matrix 2 from the FPGA PIO layer.
+      RD_VAL = READ_INPUT_FROM_PIO();
       ROW1=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
+	  NEXT_NUM_FROM_PIO();
+      RD_VAL=READ_INPUT_FROM_PIO();
       COL1=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
+	  NEXT_NUM_FROM_PIO();
+      RD_VAL=READ_INPUT_FROM_PIO();
       ROW2=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
+	  NEXT_NUM_FROM_PIO();
+      RD_VAL=READ_INPUT_FROM_PIO();
       COL2=*RD_VAL;
 
       //reading values into matrix A and B
@@ -277,7 +295,8 @@ int main()
       {
     	  for(j=0;j<COL1;j++)
     	  {
-    		  RD_VAL=(int *)0x00011010; //is this going to work?
+    		  RD_VAL=READ_INPUT_FROM_PIO(); //is this going to work?
+    		  NEXT_NUM_FROM_PIO();
     		  A[i][j]=*RD_VAL;
     	  }
       }
@@ -285,7 +304,8 @@ int main()
             {
          	  for(j=0;j<COL2;j++)
          	  {
-         		  RD_VAL=(int *)0x00011010;
+         		  RD_VAL=READ_INPUT_FROM_PIO();
+         		  NEXT_NUM_FROM_PIO();
          		  B[i][j]=*RD_VAL;
          	  }
            }
