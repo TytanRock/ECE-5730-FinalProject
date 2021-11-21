@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 ENTITY Uart_Decoder IS
-   GENERIC( 
+    GENERIC( 
             BaudRate    : IN INTEGER := 9600;
             ClockRate   : IN INTEGER := 50_000_000
 	       );
