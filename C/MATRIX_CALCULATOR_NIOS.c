@@ -349,6 +349,9 @@ int main()
     case '-':
     	matrix_sub(A,B,ROW1,COL1, ROW2,COL2);
     	break;
+    case 's'
+	scalar_matrix_mul(A,ROW1,COL1);
+	break;
     case '*':
     	matrix_mul(A,B,ROW1,COL1, ROW2,COL2);
     	break;
