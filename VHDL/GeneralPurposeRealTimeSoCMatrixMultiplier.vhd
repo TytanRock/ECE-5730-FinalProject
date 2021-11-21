@@ -14,8 +14,8 @@ ARCHITECTURE Behavior OF GeneralPurposeRealTimeSoCMatrixMultiplier IS
 
 BEGIN
 
-	LEDR(0) <= NOT UART_RX;
-	LEDR(9) <= SW(9);
 	UART_TX <= UART_RX;
+    
+    decoder : entity work.Uart_Decoder port map (CLOCK_50, UART_RX, LEDR(9), LEDR(7 DOWNTO 0));
 
 END Behavior;
