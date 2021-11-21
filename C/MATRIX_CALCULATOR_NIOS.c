@@ -202,14 +202,34 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 		}
 	}
 	for (i=0;i<r1;i++)
+	{
+		for(j=0;j<c1;j++)
+			{
+			//using lcd as output
+			}
+	}
+}
+	
+void matrix_transpose(int **a, int r1, int c1);
+	{
+		int i,j;
+		int res[r1][c1];
+		
+		for (i=0; i<c1;i++)
 		{
-			for(j=0;j<c1;j++)
+			for (j=0;j<r1;j++)
+			{ 
+				res[i][j]= a[j][i];
+			}
+		}
+		for (i=0;i<c1;i++)
+		{
+			for(j=0;j<r1;j++)
 				{
 					//using lcd as output
 				}
+		}
 	}
-
-}
 
 void matrix_det(int** a, int r2, int c2)
 {
@@ -355,6 +375,9 @@ int main()
     case '*':
     	matrix_mul(A,B,ROW1,COL1, ROW2,COL2);
     	break;
+    case 't':
+	martix_tanspose(A,ROW1,COL1);
+	break;		    
     case 'd':
     	matrix_det(A,ROW1,COL1);
     	matrix_det(B,ROW1,COL1);
