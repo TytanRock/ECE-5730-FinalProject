@@ -101,7 +101,7 @@ void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 	int i,j,k,l;
 	int res[r1][c1];
 
-	if (r1 != r2 && c2 != c1)
+	if (r1 != r2 || c1 != c2)
 	{
 		//display --> cannot be added
 	}
@@ -132,7 +132,7 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 	int i,j,k,l;
 	int res[r1][c1];
 
-	if (r1 != r2 && c2 != c1)
+	if (r1 != r2 || c1 != c2)
 	{
 		//display --->  cannot be subtracted
 	}
@@ -147,7 +147,7 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 		}
 	}
 
-	for (i=0;i<r;i++)
+	for (i=0;i<r1;i++)
 			{
 				for(j=0;j<c1;j++)
 				{
@@ -156,12 +156,33 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 
 }
 
+void scalar_matrix_mul (int **a, int r1, int c1)
+{
+	int i,j;
+	int k;  // declare as float if needed 
+	int res[r1][c1];
+	
+	for (i=0; i<r1; i++)
+	{
+		for (j=0;j<c1;j++)
+		{
+			res[i][j]=k*a[i][j];
+		}
+	}
+	for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+				{
+					//using lcd as output
+				}
+		}
+	
 void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 
 {
 	int i,j,k,l,m;
 	int res[r1][c2];
-	if(c1 != r2)
+	if(r1 != c2)
 	{
 		//display---> not possible
 	}
@@ -180,6 +201,14 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 
 		}
 	}
+	for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+				{
+					//using lcd as output
+				}
+	}
+
 }
 
 void matrix_det(int** a, int r2, int c2)
