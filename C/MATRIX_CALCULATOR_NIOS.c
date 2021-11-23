@@ -81,7 +81,7 @@
 #include "sys/alt_stdio.h"
 #include "stdlib.h"
 
-<<<<<<< HEAD
+ 
 #define PIO_INPUT_ADDR (0x00011010)// PIO width is chosen as 32 bit wide
 #define PIO_NEXT_NUM_ADDR ()
 #define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_BASE_ADDR)
@@ -90,17 +90,9 @@
 #define WRITE_OUTPUT_TO_PIO() ((*volatile int)PIO_OUTPUT_ADDR) //correct declaration or not ?
 void *DISP_VAL;// variable to store value to be displayed on lcd
 int *RD_VAL;
-/**
- 
-=======
-#define PIO_INPUT_ADDR (0x5000) // Change to match the input address of the PIO in the designer
-#define PIO_NEXT_NUM_ADDR (0x5020)
-#define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_BASE_ADDR)
-#define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
 
 /**
  * @brief Adds to matrices together
->>>>>>> main
  * 
  * @param a First matrix to add
  * @param b Second matrix to add
