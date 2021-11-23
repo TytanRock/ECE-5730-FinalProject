@@ -83,13 +83,25 @@
 
  
 #define PIO_INPUT_ADDR (0x00011010)// PIO width is chosen as 32 bit wide
-#define PIO_NEXT_NUM_ADDR ()
+#define PIO_NEXT_NUM_ADDR (0x00011000)
 #define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_BASE_ADDR)
 #define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
-#define PIO_OUTPUT_ADDR ((0x00011000))//write address
+#define PIO_OUTPUT_ADDR //write address
 #define WRITE_OUTPUT_TO_PIO() ((*volatile int)PIO_OUTPUT_ADDR) //correct declaration or not ?
-void *DISP_VAL;// variable to store value to be displayed on lcd
-int *RD_VAL;
+int DISP_VAL;// variable to store value to be displayed on lcd
+int RD_VAL;
+
+int decode_ascii() {
+	int retval = 0;
+	while(1) {
+		char value = READ_INPUT_FROM_PIO();
+		if(value == ',') break;
+		retval *= 10;
+		retval += value; 
+		NEXT_NUM_FROM_PIO();
+	}
+	return retval;
+}
 
 /**
  * @brief Adds to matrices together
@@ -398,17 +410,11 @@ int main()
   {
 	  //reading row and column size for matrix A and B
 	  // Read the row, column size of matrix 1 and matrix 2 from the FPGA PIO layer.
-      RD_VAL = READ_INPUT_FROM_PIO();
-      ROW1=*RD_VAL;
-	  NEXT_NUM_FROM_PIO();
-      RD_VAL=READ_INPUT_FROM_PIO();
-      COL1=*RD_VAL;
-	  NEXT_NUM_FROM_PIO();
-      RD_VAL=READ_INPUT_FROM_PIO();
-      ROW2=*RD_VAL;
-	  NEXT_NUM_FROM_PIO();
-      RD_VAL=READ_INPUT_FROM_PIO();
-      COL2=*RD_VAL;
+      ROW1= decode_ascii();
+      COL1=decode_ascii();
+
+      ROW2=decode_ascii();
+      COL2=decode_ascii();
 
       //reading values into matrix A and B
       //allocating memory
@@ -428,11 +434,8 @@ int main()
       {
     	  for(j=0;j<COL1;j++)
     	  {
-<<<<<<< HEAD
-    		  RD_VAL=READ_INPUT_FROM_PIO(); 
-=======
-    		  RD_VAL=READ_INPUT_FROM_PIO(); 
->>>>>>> main
+
+    		  RD_VAL=
     		  NEXT_NUM_FROM_PIO();
     		  A[i][j]=*RD_VAL;
     	  }
