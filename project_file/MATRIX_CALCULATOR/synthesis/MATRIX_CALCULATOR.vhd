@@ -8,7 +8,11 @@ use IEEE.numeric_std.all;
 
 entity MATRIX_CALCULATOR is
 	port (
-		clk_clk : in std_logic := '0'  -- clk.clk
+		clk_clk                                 : in  std_logic                    := '0';             --                              clk.clk
+		nextval_external_connection_export      : out std_logic_vector(7 downto 0);                    --      nextval_external_connection.export
+		nextwriteval_external_connection_export : out std_logic_vector(7 downto 0);                    -- nextwriteval_external_connection.export
+		readval_external_connection_export      : in  std_logic_vector(7 downto 0) := (others => '0'); --      readval_external_connection.export
+		writeval_external_connection_export     : out std_logic_vector(7 downto 0)                     --     writeval_external_connection.export
 	);
 end entity MATRIX_CALCULATOR;
 
@@ -319,7 +323,7 @@ begin
 			writedata  => mm_interconnect_0_nextval_s1_writedata,       --                    .writedata
 			chipselect => mm_interconnect_0_nextval_s1_chipselect,      --                    .chipselect
 			readdata   => mm_interconnect_0_nextval_s1_readdata,        --                    .readdata
-			out_port   => open                                          -- external_connection.export
+			out_port   => nextval_external_connection_export            -- external_connection.export
 		);
 
 	nextwriteval : component MATRIX_CALCULATOR_nextval
@@ -331,7 +335,7 @@ begin
 			writedata  => mm_interconnect_0_nextwriteval_s1_writedata,       --                    .writedata
 			chipselect => mm_interconnect_0_nextwriteval_s1_chipselect,      --                    .chipselect
 			readdata   => mm_interconnect_0_nextwriteval_s1_readdata,        --                    .readdata
-			out_port   => open                                               -- external_connection.export
+			out_port   => nextwriteval_external_connection_export            -- external_connection.export
 		);
 
 	nios2_gen2_0 : component MATRIX_CALCULATOR_nios2_gen2_0
@@ -385,7 +389,7 @@ begin
 			reset_n  => rst_controller_reset_out_reset_ports_inv, --               reset.reset_n
 			address  => mm_interconnect_0_readval_s1_address,     --                  s1.address
 			readdata => mm_interconnect_0_readval_s1_readdata,    --                    .readdata
-			in_port  => open                                      -- external_connection.export
+			in_port  => readval_external_connection_export        -- external_connection.export
 		);
 
 	writeval : component MATRIX_CALCULATOR_nextval
@@ -397,7 +401,7 @@ begin
 			writedata  => mm_interconnect_0_writeval_s1_writedata,       --                    .writedata
 			chipselect => mm_interconnect_0_writeval_s1_chipselect,      --                    .chipselect
 			readdata   => mm_interconnect_0_writeval_s1_readdata,        --                    .readdata
-			out_port   => open                                           -- external_connection.export
+			out_port   => writeval_external_connection_export            -- external_connection.export
 		);
 
 	mm_interconnect_0 : component MATRIX_CALCULATOR_mm_interconnect_0

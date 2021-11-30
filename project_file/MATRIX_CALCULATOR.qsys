@@ -40,6 +40,11 @@
          value = "4";
          type = "int";
       }
+      datum sopceditor_expanded
+      {
+         value = "1";
+         type = "boolean";
+      }
    }
    element nextval.s1
    {
@@ -151,6 +156,26 @@
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
+ <interface
+   name="nextval_external_connection"
+   internal="nextval.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="nextwriteval_external_connection"
+   internal="nextwriteval.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="readval_external_connection"
+   internal="readval.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="writeval_external_connection"
+   internal="writeval.external_connection"
+   type="conduit"
+   dir="end" />
  <module name="clk_0" kind="clock_source" version="18.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
