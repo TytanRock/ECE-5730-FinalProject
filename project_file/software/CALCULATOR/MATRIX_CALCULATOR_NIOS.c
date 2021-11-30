@@ -84,17 +84,22 @@
 #include "math.h"
 
 
-#define PIO_INPUT_ADDR (0x00021030)// PIO width is chosen as 32 bit wide
+#define PIO_INPUT_ADDR (0x00021030)
 #define PIO_NEXT_NUM_ADDR (0x00021020)
 #define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_INPUT_ADDR)
 #define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
 #define PIO_OUTPUT_ADDR (0x00021010)
 #define PIO_WRITE_NEXT (0X00021000)
 #define WRITE_OUTPUT_TO_PIO() (*(volatile int*)PIO_OUTPUT_ADDR)
-#define WRITE_NEXT_OUTPUT (*(volatile int)PIO_WRITE_NEXT)
-int DISP_VAL;// variable to store value to be displayed on lcd
-int RD_VAL;
+#define WRITE_NEXT_OUTPUT() (*(volatile int*)PIO_WRITE_NEXT)
 
+
+void display (char s)
+{
+	WRITE_OUTPUT_TO_PIO()=&s;
+	WRITE_NEXT_OUTPUT()=0;
+			WRITE_NEXT_OUTPUT()=1;
+}
 int decode_ascii() {
 	int retval = 0;
 	while(1) {
@@ -103,6 +108,7 @@ int decode_ascii() {
 		retval *= 10;
 		retval += value;
 		NEXT_NUM_FROM_PIO();
+
 	}
 	return retval;
 }
@@ -125,7 +131,14 @@ void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 	if (r1 != r2 || c2 != c1)
 	{
 
-		printf("cannot be added");
+		char s[100];
+        char disp[]="Cannot be added";
+
+							    sprintf(s,"%s",disp);
+							    for (int index=0; s[index]!='\0';index++)
+							    {
+							    display(s[index]);
+							    }
 	}
 	else
 	{
@@ -142,10 +155,18 @@ void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 			{
 				for(j=0;j<c1;j++)
 				{
-					//using lcd as output
-					WRITE_OUTPUT_TO_PIO()=res[i][j];
-				}
 
+					char s[100];
+
+
+					    sprintf(s,"%d\t",res[i][j]);
+					    for (int index=0; s[index]!='\0';index++)
+					    {
+					    display(s[index]);
+					    }
+				}
+          char new_line='\n';
+          display(new_line);
 	}
 
 }
@@ -166,8 +187,15 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 
 	if (r1 != r2 || c2 != c1)
 	{
-		printf("cannot be subtracted");
-//display --->  cannot be subtracted
+		char s[100];
+		        char disp[]="Cannot be subtracted";
+
+									    sprintf(s,"%s",disp);
+									    for (int index=0; s[index]!='\0';index++)
+									    {
+									    display(s[index]);
+									    }
+
 	}
 	else
 	{
@@ -181,14 +209,40 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 	}
 
 	for (i=0;i<r1;i++)
-			{
-				for(j=0;j<c1;j++)
 				{
-					//using lcd as output
-					WRITE_OUTPUT_TO_PIO()=res[i][j];
-				}
+					for(j=0;j<c1;j++)
+					{
 
-	}
+						char s[100];
+
+
+											    sprintf(s,"%d",res[i][j]);
+											    for (int index=0; s[index]!='\0';index++)
+											    {
+											    display(s[index]);
+											    }
+					}
+
+		}
+	for (i=0;i<r1;i++)
+	{
+		for(j=0;j<c1;j++)
+		{
+
+			char s[100];
+
+
+								    sprintf(s,"%d",res[i][j]);
+								    for (int index=0; s[index]!='\0';index++)
+								    {
+								    display(s[index]);
+								    }
+		}
+		char new_line='\n';
+		          display(new_line);
+
+}
+
 
 }
 
@@ -210,8 +264,15 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 	int res[r1][c2];
 	if(c1 != r2)
 	{
-		//display---> not possible
-		printf("cannot be multiplied");
+
+		char s[100];
+				        char disp[]="Cannot be multiplied";
+
+				        sprintf(s,"%s",disp);
+					    for (int index=0; s[index]!='\0';index++)
+
+							  {display(s[index]);}
+
 	}
 	else
 	{
@@ -230,20 +291,30 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 	}
 
 	for (i=0;i<r1;i++)
-			{
-				for(j=0;j<c1;j++)
 				{
-					//using lcd as output
-					WRITE_OUTPUT_TO_PIO()=res[i][j];
-				}
+					for(j=0;j<c2;j++)
+					{
 
-	}
+						char s[100];
+
+
+						 sprintf(s,"%d",res[i][j]);
+						for (int index=0; s[index]!='\0';index++)
+						{
+						display(s[index]);
+						 }
+					}
+					char new_line='\n';
+					          display(new_line);
+
+		}
+
 }
 //scalar multiplication
 void scalar_matrix_mul (int **a, int r1, int c1)
 {
 	int i,j;
-	int k;  // declare as float if needed
+	int k;
 	int res[r1][c1];
 
 	for (i=0; i<r1; i++)
@@ -257,8 +328,17 @@ void scalar_matrix_mul (int **a, int r1, int c1)
 		{
 			for(j=0;j<c1;j++)
 				{
-					//using lcd as output
+				char s[100];
+
+
+				 sprintf(s,"%d",res[i][j]);
+				for (int index=0; s[index]!='\0';index++)
+				{
+					display(s[index]);
+				 }
 				}
+			char new_line='\n';
+			          display(new_line);
 		}}
 /**
  * @brief Calculates determinant of a matrix
@@ -282,7 +362,13 @@ void scalar_matrix_mul (int **a, int r1, int c1)
     if(r1!=c1)
     {
      //not possible to find determinant
-     printf("not possible/n");
+    	char s[100];
+    					        char disp[]="Not possible";
+
+    					        sprintf(s,"%s",disp);
+    						    for (int index=0; s[index]!='\0';index++)
+
+    								  {display(s[index]);}
     }
     else
     {
@@ -309,7 +395,7 @@ void scalar_matrix_mul (int **a, int r1, int c1)
 
                 temp= malloc(2*sizeof*temp);
 
-      for (i=0; i< 2; i++)
+      for (i=0; i< n; i++)
       {
     	  temp[i]= malloc(2*sizeof*temp[i]);
       }
@@ -393,12 +479,21 @@ void matrix_transpose(int **a, int r1, int c1)
 		{
 			for(j=0;j<r1;j++)
 				{
-					printf("yes");
+				char s[100];
+
+
+				sprintf(s,"%d",res[i][j]);
+				for (int index=0; s[index]!='\0';index++)
+				{
+				display(s[index]);
 				}
+				}
+			char new_line='\n';
+			          display(new_line);
 		}
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////
+/*......Main Program ........*/
 
 
 int main()
@@ -408,8 +503,8 @@ int main()
   int **B ;
   int Determinant_A,Determinant_B;
 
-  char OP_SEL; //can be converted to integer
-
+  int OP_SEL;
+  char str[100];
 
   int i,j,k;
   while(1)
@@ -441,39 +536,52 @@ int main()
     	  for(j=0;j<COL1;j++)
     	  {
 
-    		  RD_VAL=
-    		  NEXT_NUM_FROM_PIO();
-    		  A[i][j]=RD_VAL;
+
+    		  A[i][j]=decode_ascii();
     	  }
       }
       for (i=0;i<ROW2; i++)
             {
          	  for(j=0;j<COL2;j++)
          	  {
-         		  RD_VAL=READ_INPUT_FROM_PIO();
-         		  NEXT_NUM_FROM_PIO();
-         		  B[i][j]=RD_VAL;
+
+         		  B[i][j]=decode_ascii();
          	  }
            }
        //selecting operator
-      RD_VAL=(char *)0x00011010;
-      OP_SEL=RD_VAL;
+
+      OP_SEL=decode_ascii();
+
 
     switch (OP_SEL){
-    case '+':
+    case '1':
     	matrix_add(A,B,ROW1,COL1, ROW2,COL2);
     	break;
-    case '-':
+    case '2':
     	matrix_sub(A,B,ROW1,COL1, ROW2,COL2);
     	break;
-    case '*':
+    case '3':
     	matrix_mul(A,B,ROW1,COL1, ROW2,COL2);
     	break;
-    case 'd':
+    case '4':
     	Determinant_A=matrix_det(A,ROW1,COL1);
-    	Determinant_B=matrix_det(B,ROW1,COL1);
+    	char s[100];
+    	sprintf(s,"%d",Determinant_A);
+
+    	for (int index=0; s[index]!='\0';index++)
+    	{
+    		display(s[index]);
+    	}
+    	Determinant_B=matrix_det(B,ROW2,COL2);
+
+    	    	sprintf(str,"%d",Determinant_B);
+
+    	    	for (int index=0; str[index]!='\0';index++)
+    	    	{
+    	    		display(str[index]);
+    	    	}
     	break;
-    case 't':
+    case '5':
         matrix_transpose(A,ROW1,COL1);
         break;
 
