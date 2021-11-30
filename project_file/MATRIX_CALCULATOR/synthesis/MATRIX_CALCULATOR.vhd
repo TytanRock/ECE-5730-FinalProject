@@ -37,7 +37,7 @@ architecture rtl of MATRIX_CALCULATOR is
 			writedata  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
 			chipselect : in  std_logic                     := 'X';             -- chipselect
 			readdata   : out std_logic_vector(31 downto 0);                    -- readdata
-			out_port   : out std_logic_vector(31 downto 0)                     -- export
+			out_port   : out std_logic_vector(7 downto 0)                      -- export
 		);
 	end component MATRIX_CALCULATOR_nextval;
 
@@ -46,7 +46,7 @@ architecture rtl of MATRIX_CALCULATOR is
 			clk                                 : in  std_logic                     := 'X';             -- clk
 			reset_n                             : in  std_logic                     := 'X';             -- reset_n
 			reset_req                           : in  std_logic                     := 'X';             -- reset_req
-			d_address                           : out std_logic_vector(16 downto 0);                    -- address
+			d_address                           : out std_logic_vector(17 downto 0);                    -- address
 			d_byteenable                        : out std_logic_vector(3 downto 0);                     -- byteenable
 			d_read                              : out std_logic;                                        -- read
 			d_readdata                          : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
@@ -54,7 +54,7 @@ architecture rtl of MATRIX_CALCULATOR is
 			d_write                             : out std_logic;                                        -- write
 			d_writedata                         : out std_logic_vector(31 downto 0);                    -- writedata
 			debug_mem_slave_debugaccess_to_roms : out std_logic;                                        -- debugaccess
-			i_address                           : out std_logic_vector(16 downto 0);                    -- address
+			i_address                           : out std_logic_vector(17 downto 0);                    -- address
 			i_read                              : out std_logic;                                        -- read
 			i_readdata                          : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
 			i_waitrequest                       : in  std_logic                     := 'X';             -- waitrequest
@@ -94,7 +94,7 @@ architecture rtl of MATRIX_CALCULATOR is
 			reset_n  : in  std_logic                     := 'X';             -- reset_n
 			address  : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- address
 			readdata : out std_logic_vector(31 downto 0);                    -- readdata
-			in_port  : in  std_logic_vector(31 downto 0) := (others => 'X')  -- export
+			in_port  : in  std_logic_vector(7 downto 0)  := (others => 'X')  -- export
 		);
 	end component MATRIX_CALCULATOR_readval;
 
@@ -102,7 +102,7 @@ architecture rtl of MATRIX_CALCULATOR is
 		port (
 			clk_0_clk_clk                                  : in  std_logic                     := 'X';             -- clk
 			nios2_gen2_0_reset_reset_bridge_in_reset_reset : in  std_logic                     := 'X';             -- reset
-			nios2_gen2_0_data_master_address               : in  std_logic_vector(16 downto 0) := (others => 'X'); -- address
+			nios2_gen2_0_data_master_address               : in  std_logic_vector(17 downto 0) := (others => 'X'); -- address
 			nios2_gen2_0_data_master_waitrequest           : out std_logic;                                        -- waitrequest
 			nios2_gen2_0_data_master_byteenable            : in  std_logic_vector(3 downto 0)  := (others => 'X'); -- byteenable
 			nios2_gen2_0_data_master_read                  : in  std_logic                     := 'X';             -- read
@@ -110,7 +110,7 @@ architecture rtl of MATRIX_CALCULATOR is
 			nios2_gen2_0_data_master_write                 : in  std_logic                     := 'X';             -- write
 			nios2_gen2_0_data_master_writedata             : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
 			nios2_gen2_0_data_master_debugaccess           : in  std_logic                     := 'X';             -- debugaccess
-			nios2_gen2_0_instruction_master_address        : in  std_logic_vector(16 downto 0) := (others => 'X'); -- address
+			nios2_gen2_0_instruction_master_address        : in  std_logic_vector(17 downto 0) := (others => 'X'); -- address
 			nios2_gen2_0_instruction_master_waitrequest    : out std_logic;                                        -- waitrequest
 			nios2_gen2_0_instruction_master_read           : in  std_logic                     := 'X';             -- read
 			nios2_gen2_0_instruction_master_readdata       : out std_logic_vector(31 downto 0);                    -- readdata
@@ -126,6 +126,11 @@ architecture rtl of MATRIX_CALCULATOR is
 			nextval_s1_readdata                            : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
 			nextval_s1_writedata                           : out std_logic_vector(31 downto 0);                    -- writedata
 			nextval_s1_chipselect                          : out std_logic;                                        -- chipselect
+			nextwriteval_s1_address                        : out std_logic_vector(1 downto 0);                     -- address
+			nextwriteval_s1_write                          : out std_logic;                                        -- write
+			nextwriteval_s1_readdata                       : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			nextwriteval_s1_writedata                      : out std_logic_vector(31 downto 0);                    -- writedata
+			nextwriteval_s1_chipselect                     : out std_logic;                                        -- chipselect
 			nios2_gen2_0_debug_mem_slave_address           : out std_logic_vector(8 downto 0);                     -- address
 			nios2_gen2_0_debug_mem_slave_write             : out std_logic;                                        -- write
 			nios2_gen2_0_debug_mem_slave_read              : out std_logic;                                        -- read
@@ -142,7 +147,12 @@ architecture rtl of MATRIX_CALCULATOR is
 			onchip_memory2_0_s1_chipselect                 : out std_logic;                                        -- chipselect
 			onchip_memory2_0_s1_clken                      : out std_logic;                                        -- clken
 			readval_s1_address                             : out std_logic_vector(1 downto 0);                     -- address
-			readval_s1_readdata                            : in  std_logic_vector(31 downto 0) := (others => 'X')  -- readdata
+			readval_s1_readdata                            : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			writeval_s1_address                            : out std_logic_vector(1 downto 0);                     -- address
+			writeval_s1_write                              : out std_logic;                                        -- write
+			writeval_s1_readdata                           : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			writeval_s1_writedata                          : out std_logic_vector(31 downto 0);                    -- writedata
+			writeval_s1_chipselect                         : out std_logic                                         -- chipselect
 		);
 	end component MATRIX_CALCULATOR_mm_interconnect_0;
 
@@ -225,14 +235,14 @@ architecture rtl of MATRIX_CALCULATOR is
 	signal nios2_gen2_0_data_master_readdata                               : std_logic_vector(31 downto 0); -- mm_interconnect_0:nios2_gen2_0_data_master_readdata -> nios2_gen2_0:d_readdata
 	signal nios2_gen2_0_data_master_waitrequest                            : std_logic;                     -- mm_interconnect_0:nios2_gen2_0_data_master_waitrequest -> nios2_gen2_0:d_waitrequest
 	signal nios2_gen2_0_data_master_debugaccess                            : std_logic;                     -- nios2_gen2_0:debug_mem_slave_debugaccess_to_roms -> mm_interconnect_0:nios2_gen2_0_data_master_debugaccess
-	signal nios2_gen2_0_data_master_address                                : std_logic_vector(16 downto 0); -- nios2_gen2_0:d_address -> mm_interconnect_0:nios2_gen2_0_data_master_address
+	signal nios2_gen2_0_data_master_address                                : std_logic_vector(17 downto 0); -- nios2_gen2_0:d_address -> mm_interconnect_0:nios2_gen2_0_data_master_address
 	signal nios2_gen2_0_data_master_byteenable                             : std_logic_vector(3 downto 0);  -- nios2_gen2_0:d_byteenable -> mm_interconnect_0:nios2_gen2_0_data_master_byteenable
 	signal nios2_gen2_0_data_master_read                                   : std_logic;                     -- nios2_gen2_0:d_read -> mm_interconnect_0:nios2_gen2_0_data_master_read
 	signal nios2_gen2_0_data_master_write                                  : std_logic;                     -- nios2_gen2_0:d_write -> mm_interconnect_0:nios2_gen2_0_data_master_write
 	signal nios2_gen2_0_data_master_writedata                              : std_logic_vector(31 downto 0); -- nios2_gen2_0:d_writedata -> mm_interconnect_0:nios2_gen2_0_data_master_writedata
 	signal nios2_gen2_0_instruction_master_readdata                        : std_logic_vector(31 downto 0); -- mm_interconnect_0:nios2_gen2_0_instruction_master_readdata -> nios2_gen2_0:i_readdata
 	signal nios2_gen2_0_instruction_master_waitrequest                     : std_logic;                     -- mm_interconnect_0:nios2_gen2_0_instruction_master_waitrequest -> nios2_gen2_0:i_waitrequest
-	signal nios2_gen2_0_instruction_master_address                         : std_logic_vector(16 downto 0); -- nios2_gen2_0:i_address -> mm_interconnect_0:nios2_gen2_0_instruction_master_address
+	signal nios2_gen2_0_instruction_master_address                         : std_logic_vector(17 downto 0); -- nios2_gen2_0:i_address -> mm_interconnect_0:nios2_gen2_0_instruction_master_address
 	signal nios2_gen2_0_instruction_master_read                            : std_logic;                     -- nios2_gen2_0:i_read -> mm_interconnect_0:nios2_gen2_0_instruction_master_read
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_chipselect      : std_logic;                     -- mm_interconnect_0:jtag_uart_0_avalon_jtag_slave_chipselect -> jtag_uart_0:av_chipselect
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_readdata        : std_logic_vector(31 downto 0); -- jtag_uart_0:av_readdata -> mm_interconnect_0:jtag_uart_0_avalon_jtag_slave_readdata
@@ -263,6 +273,16 @@ architecture rtl of MATRIX_CALCULATOR is
 	signal mm_interconnect_0_nextval_s1_address                            : std_logic_vector(1 downto 0);  -- mm_interconnect_0:nextval_s1_address -> nextval:address
 	signal mm_interconnect_0_nextval_s1_write                              : std_logic;                     -- mm_interconnect_0:nextval_s1_write -> mm_interconnect_0_nextval_s1_write:in
 	signal mm_interconnect_0_nextval_s1_writedata                          : std_logic_vector(31 downto 0); -- mm_interconnect_0:nextval_s1_writedata -> nextval:writedata
+	signal mm_interconnect_0_writeval_s1_chipselect                        : std_logic;                     -- mm_interconnect_0:writeval_s1_chipselect -> writeval:chipselect
+	signal mm_interconnect_0_writeval_s1_readdata                          : std_logic_vector(31 downto 0); -- writeval:readdata -> mm_interconnect_0:writeval_s1_readdata
+	signal mm_interconnect_0_writeval_s1_address                           : std_logic_vector(1 downto 0);  -- mm_interconnect_0:writeval_s1_address -> writeval:address
+	signal mm_interconnect_0_writeval_s1_write                             : std_logic;                     -- mm_interconnect_0:writeval_s1_write -> mm_interconnect_0_writeval_s1_write:in
+	signal mm_interconnect_0_writeval_s1_writedata                         : std_logic_vector(31 downto 0); -- mm_interconnect_0:writeval_s1_writedata -> writeval:writedata
+	signal mm_interconnect_0_nextwriteval_s1_chipselect                    : std_logic;                     -- mm_interconnect_0:nextwriteval_s1_chipselect -> nextwriteval:chipselect
+	signal mm_interconnect_0_nextwriteval_s1_readdata                      : std_logic_vector(31 downto 0); -- nextwriteval:readdata -> mm_interconnect_0:nextwriteval_s1_readdata
+	signal mm_interconnect_0_nextwriteval_s1_address                       : std_logic_vector(1 downto 0);  -- mm_interconnect_0:nextwriteval_s1_address -> nextwriteval:address
+	signal mm_interconnect_0_nextwriteval_s1_write                         : std_logic;                     -- mm_interconnect_0:nextwriteval_s1_write -> mm_interconnect_0_nextwriteval_s1_write:in
+	signal mm_interconnect_0_nextwriteval_s1_writedata                     : std_logic_vector(31 downto 0); -- mm_interconnect_0:nextwriteval_s1_writedata -> nextwriteval:writedata
 	signal irq_mapper_receiver0_irq                                        : std_logic;                     -- jtag_uart_0:av_irq -> irq_mapper:receiver0_irq
 	signal nios2_gen2_0_irq_irq                                            : std_logic_vector(31 downto 0); -- irq_mapper:sender_irq -> nios2_gen2_0:irq
 	signal rst_controller_reset_out_reset                                  : std_logic;                     -- rst_controller:reset_out -> [irq_mapper:reset, mm_interconnect_0:nios2_gen2_0_reset_reset_bridge_in_reset_reset, onchip_memory2_0:reset, rst_controller_reset_out_reset:in, rst_translator:in_reset]
@@ -270,7 +290,9 @@ architecture rtl of MATRIX_CALCULATOR is
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read_ports_inv  : std_logic;                     -- mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read:inv -> jtag_uart_0:av_read_n
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write_ports_inv : std_logic;                     -- mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write:inv -> jtag_uart_0:av_write_n
 	signal mm_interconnect_0_nextval_s1_write_ports_inv                    : std_logic;                     -- mm_interconnect_0_nextval_s1_write:inv -> nextval:write_n
-	signal rst_controller_reset_out_reset_ports_inv                        : std_logic;                     -- rst_controller_reset_out_reset:inv -> [jtag_uart_0:rst_n, nextval:reset_n, nios2_gen2_0:reset_n, readval:reset_n]
+	signal mm_interconnect_0_writeval_s1_write_ports_inv                   : std_logic;                     -- mm_interconnect_0_writeval_s1_write:inv -> writeval:write_n
+	signal mm_interconnect_0_nextwriteval_s1_write_ports_inv               : std_logic;                     -- mm_interconnect_0_nextwriteval_s1_write:inv -> nextwriteval:write_n
+	signal rst_controller_reset_out_reset_ports_inv                        : std_logic;                     -- rst_controller_reset_out_reset:inv -> [jtag_uart_0:rst_n, nextval:reset_n, nextwriteval:reset_n, nios2_gen2_0:reset_n, readval:reset_n, writeval:reset_n]
 
 begin
 
@@ -298,6 +320,18 @@ begin
 			chipselect => mm_interconnect_0_nextval_s1_chipselect,      --                    .chipselect
 			readdata   => mm_interconnect_0_nextval_s1_readdata,        --                    .readdata
 			out_port   => open                                          -- external_connection.export
+		);
+
+	nextwriteval : component MATRIX_CALCULATOR_nextval
+		port map (
+			clk        => clk_clk,                                           --                 clk.clk
+			reset_n    => rst_controller_reset_out_reset_ports_inv,          --               reset.reset_n
+			address    => mm_interconnect_0_nextwriteval_s1_address,         --                  s1.address
+			write_n    => mm_interconnect_0_nextwriteval_s1_write_ports_inv, --                    .write_n
+			writedata  => mm_interconnect_0_nextwriteval_s1_writedata,       --                    .writedata
+			chipselect => mm_interconnect_0_nextwriteval_s1_chipselect,      --                    .chipselect
+			readdata   => mm_interconnect_0_nextwriteval_s1_readdata,        --                    .readdata
+			out_port   => open                                               -- external_connection.export
 		);
 
 	nios2_gen2_0 : component MATRIX_CALCULATOR_nios2_gen2_0
@@ -354,6 +388,18 @@ begin
 			in_port  => open                                      -- external_connection.export
 		);
 
+	writeval : component MATRIX_CALCULATOR_nextval
+		port map (
+			clk        => clk_clk,                                       --                 clk.clk
+			reset_n    => rst_controller_reset_out_reset_ports_inv,      --               reset.reset_n
+			address    => mm_interconnect_0_writeval_s1_address,         --                  s1.address
+			write_n    => mm_interconnect_0_writeval_s1_write_ports_inv, --                    .write_n
+			writedata  => mm_interconnect_0_writeval_s1_writedata,       --                    .writedata
+			chipselect => mm_interconnect_0_writeval_s1_chipselect,      --                    .chipselect
+			readdata   => mm_interconnect_0_writeval_s1_readdata,        --                    .readdata
+			out_port   => open                                           -- external_connection.export
+		);
+
 	mm_interconnect_0 : component MATRIX_CALCULATOR_mm_interconnect_0
 		port map (
 			clk_0_clk_clk                                  => clk_clk,                                                     --                                clk_0_clk.clk
@@ -382,6 +428,11 @@ begin
 			nextval_s1_readdata                            => mm_interconnect_0_nextval_s1_readdata,                       --                                         .readdata
 			nextval_s1_writedata                           => mm_interconnect_0_nextval_s1_writedata,                      --                                         .writedata
 			nextval_s1_chipselect                          => mm_interconnect_0_nextval_s1_chipselect,                     --                                         .chipselect
+			nextwriteval_s1_address                        => mm_interconnect_0_nextwriteval_s1_address,                   --                          nextwriteval_s1.address
+			nextwriteval_s1_write                          => mm_interconnect_0_nextwriteval_s1_write,                     --                                         .write
+			nextwriteval_s1_readdata                       => mm_interconnect_0_nextwriteval_s1_readdata,                  --                                         .readdata
+			nextwriteval_s1_writedata                      => mm_interconnect_0_nextwriteval_s1_writedata,                 --                                         .writedata
+			nextwriteval_s1_chipselect                     => mm_interconnect_0_nextwriteval_s1_chipselect,                --                                         .chipselect
 			nios2_gen2_0_debug_mem_slave_address           => mm_interconnect_0_nios2_gen2_0_debug_mem_slave_address,      --             nios2_gen2_0_debug_mem_slave.address
 			nios2_gen2_0_debug_mem_slave_write             => mm_interconnect_0_nios2_gen2_0_debug_mem_slave_write,        --                                         .write
 			nios2_gen2_0_debug_mem_slave_read              => mm_interconnect_0_nios2_gen2_0_debug_mem_slave_read,         --                                         .read
@@ -398,7 +449,12 @@ begin
 			onchip_memory2_0_s1_chipselect                 => mm_interconnect_0_onchip_memory2_0_s1_chipselect,            --                                         .chipselect
 			onchip_memory2_0_s1_clken                      => mm_interconnect_0_onchip_memory2_0_s1_clken,                 --                                         .clken
 			readval_s1_address                             => mm_interconnect_0_readval_s1_address,                        --                               readval_s1.address
-			readval_s1_readdata                            => mm_interconnect_0_readval_s1_readdata                        --                                         .readdata
+			readval_s1_readdata                            => mm_interconnect_0_readval_s1_readdata,                       --                                         .readdata
+			writeval_s1_address                            => mm_interconnect_0_writeval_s1_address,                       --                              writeval_s1.address
+			writeval_s1_write                              => mm_interconnect_0_writeval_s1_write,                         --                                         .write
+			writeval_s1_readdata                           => mm_interconnect_0_writeval_s1_readdata,                      --                                         .readdata
+			writeval_s1_writedata                          => mm_interconnect_0_writeval_s1_writedata,                     --                                         .writedata
+			writeval_s1_chipselect                         => mm_interconnect_0_writeval_s1_chipselect                     --                                         .chipselect
 		);
 
 	irq_mapper : component MATRIX_CALCULATOR_irq_mapper
@@ -479,6 +535,10 @@ begin
 	mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write_ports_inv <= not mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write;
 
 	mm_interconnect_0_nextval_s1_write_ports_inv <= not mm_interconnect_0_nextval_s1_write;
+
+	mm_interconnect_0_writeval_s1_write_ports_inv <= not mm_interconnect_0_writeval_s1_write;
+
+	mm_interconnect_0_nextwriteval_s1_write_ports_inv <= not mm_interconnect_0_nextwriteval_s1_write;
 
 	rst_controller_reset_out_reset_ports_inv <= not rst_controller_reset_out_reset;
 

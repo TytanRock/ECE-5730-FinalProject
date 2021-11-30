@@ -8,13 +8,13 @@ preplace inst MATRIX_CALCULATOR.jtag_uart_0 -pg 1 -lvl 2 -y 30
 preplace inst MATRIX_CALCULATOR.onchip_memory2_0 -pg 1 -lvl 2 -y 230
 preplace inst MATRIX_CALCULATOR.clk_0 -pg 1 -lvl 2 -y 450
 preplace inst MATRIX_CALCULATOR -pg 1 -lvl 1 -y 40 -regy -20
-preplace inst MATRIX_CALCULATOR.dispval -pg 1 -lvl 2 -y 130
-preplace inst MATRIX_CALCULATOR.readval -pg 1 -lvl 2 -y 330
-preplace netloc FAN_OUT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)onchip_memory2_0.reset1,(MASTER)clk_0.clk_reset,(SLAVE)readval.reset,(SLAVE)nios2_gen2_0.reset,(SLAVE)dispval.reset,(SLAVE)jtag_uart_0.reset) 1 0 3 80 240 500 440 740
-preplace netloc POINT_TO_POINT<net_container>MATRIX_CALCULATOR</net_container>(MASTER)nios2_gen2_0.irq,(SLAVE)jtag_uart_0.irq) 1 1 1 460
-preplace netloc INTERCONNECT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)dispval.s1,(SLAVE)readval.s1,(MASTER)nios2_gen2_0.data_master,(SLAVE)jtag_uart_0.avalon_jtag_slave,(MASTER)nios2_gen2_0.instruction_master,(SLAVE)nios2_gen2_0.debug_mem_slave,(SLAVE)onchip_memory2_0.s1) 1 0 2 60 260 480
-preplace netloc FAN_OUT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)dispval.clk,(SLAVE)onchip_memory2_0.clk1,(SLAVE)jtag_uart_0.clk,(MASTER)clk_0.clk,(SLAVE)nios2_gen2_0.clk,(SLAVE)readval.clk) 1 0 3 60 60 520 320 760
-preplace netloc EXPORT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)MATRIX_CALCULATOR.clk,(SLAVE)clk_0.clk_in) 1 0 2 NJ 460 NJ
+preplace inst MATRIX_CALCULATOR.nextval -pg 1 -lvl 3 -y 450
+preplace inst MATRIX_CALCULATOR.readval -pg 1 -lvl 2 -y 310
+preplace netloc INTERCONNECT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)jtag_uart_0.avalon_jtag_slave,(MASTER)nios2_gen2_0.instruction_master,(SLAVE)nextval.s1,(MASTER)nios2_gen2_0.data_master,(SLAVE)readval.s1,(SLAVE)onchip_memory2_0.s1,(SLAVE)nios2_gen2_0.debug_mem_slave) 1 0 3 60 260 460 520 N
+preplace netloc FAN_OUT<net_container>MATRIX_CALCULATOR</net_container>(MASTER)clk_0.clk,(SLAVE)nextval.clk,(SLAVE)nios2_gen2_0.clk,(SLAVE)readval.clk,(SLAVE)jtag_uart_0.clk,(SLAVE)onchip_memory2_0.clk1) 1 0 3 60 60 520 420 760
+preplace netloc FAN_OUT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)readval.reset,(SLAVE)onchip_memory2_0.reset1,(MASTER)clk_0.clk_reset,(SLAVE)nextval.reset,(SLAVE)jtag_uart_0.reset,(SLAVE)nios2_gen2_0.reset) 1 0 3 80 240 500 440 740
+preplace netloc EXPORT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)clk_0.clk_in,(SLAVE)MATRIX_CALCULATOR.clk) 1 0 2 NJ 460 NJ
 preplace netloc POINT_TO_POINT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)clk_0.clk_in_reset,(MASTER)nios2_gen2_0.debug_reset_request) 1 1 1 440
-levelinfo -pg 1 0 30 800
-levelinfo -hier MATRIX_CALCULATOR 40 200 570 780
+preplace netloc POINT_TO_POINT<net_container>MATRIX_CALCULATOR</net_container>(SLAVE)jtag_uart_0.irq,(MASTER)nios2_gen2_0.irq) 1 1 1 480
+levelinfo -pg 1 0 30 950
+levelinfo -hier MATRIX_CALCULATOR 40 200 570 790 940
