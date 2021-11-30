@@ -80,16 +80,52 @@
 
 #include "sys/alt_stdio.h"
 #include "stdlib.h"
+#include "stdio.h"
+#include "math.h"
 
 
+#define PIO_INPUT_ADDR (0x00021030)// PIO width is chosen as 32 bit wide
+#define PIO_NEXT_NUM_ADDR (0x00021020)
+#define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_INPUT_ADDR)
+#define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
+#define PIO_OUTPUT_ADDR (0x00021010)
+#define PIO_WRITE_NEXT (0X00021000)
+#define WRITE_OUTPUT_TO_PIO() (*(volatile int*)PIO_OUTPUT_ADDR)
+#define WRITE_NEXT_OUTPUT (*(volatile int)PIO_WRITE_NEXT)
+int DISP_VAL;// variable to store value to be displayed on lcd
+int RD_VAL;
+
+int decode_ascii() {
+	int retval = 0;
+	while(1) {
+		char value = READ_INPUT_FROM_PIO();
+		if(value == ',') break;
+		retval *= 10;
+		retval += value;
+		NEXT_NUM_FROM_PIO();
+	}
+	return retval;
+}
+
+/**
+ * @brief Adds to matrices together
+ *
+ * @param a First matrix to add
+ * @param b Second matrix to add
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
 void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 {
 	int i,j,k,l;
 	int res[r1][c1];
 
-	if (r1 != r2 && c2 != c1)
+	if (r1 != r2 || c2 != c1)
 	{
-		//display --> cannot be added
+
+		printf("cannot be added");
 	}
 	else
 	{
@@ -107,20 +143,31 @@ void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 				for(j=0;j<c1;j++)
 				{
 					//using lcd as output
+					WRITE_OUTPUT_TO_PIO()=res[i][j];
 				}
-		//new line
+
 	}
 
 }
-
+/**
+ * @brief  performs matrix subtraction
+ *
+ * @param a First matrix
+ * @param b Second matrix
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
 void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 {
 	int i,j,k,l;
 	int res[r1][c1];
 
-	if (r1 != r2 && c2 != c1)
+	if (r1 != r2 || c2 != c1)
 	{
-		//display --->  cannot be subtracted
+		printf("cannot be subtracted");
+//display --->  cannot be subtracted
 	}
 	else
 	{
@@ -133,14 +180,28 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 		}
 	}
 
-	for (i=0;i<r;i++)
+	for (i=0;i<r1;i++)
 			{
 				for(j=0;j<c1;j++)
 				{
 					//using lcd as output
+					WRITE_OUTPUT_TO_PIO()=res[i][j];
 				}
 
+	}
+
 }
+
+/**
+ * @brief Multiplies two matrices together
+ *
+ * @param a First matrix
+ * @param b Second matrix
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
 
 void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 
@@ -150,6 +211,7 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 	if(c1 != r2)
 	{
 		//display---> not possible
+		printf("cannot be multiplied");
 	}
 	else
 	{
@@ -166,49 +228,92 @@ void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
 
 		}
 	}
-}
 
-void matrix_det(int** a, int r2, int c2)
+	for (i=0;i<r1;i++)
+			{
+				for(j=0;j<c1;j++)
+				{
+					//using lcd as output
+					WRITE_OUTPUT_TO_PIO()=res[i][j];
+				}
+
+	}
+}
+//scalar multiplication
+void scalar_matrix_mul (int **a, int r1, int c1)
 {
-    int D = 0; // Initialize result
+	int i,j;
+	int k;  // declare as float if needed
+	int res[r1][c1];
+
+	for (i=0; i<r1; i++)
+	{
+		for (j=0;j<c1;j++)
+		{
+			res[i][j]=k*a[i][j];
+		}
+	}
+	for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+				{
+					//using lcd as output
+				}
+		}}
+/**
+ * @brief Calculates determinant of a matrix
+ *
+ * @param a First matrix whose determinant is calculated
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+
+ */
+
+ int matrix_det(int** a, int r1, int c1)
+{
+    int D ;
+    int D1;
  int n;
+ int **temp;
+ int i,j=0;
+ int sign = 1;
+
     //  Base case : if matrix contains single element
     if(r1!=c1)
     {
      //not possible to find determinant
+     printf("not possible/n");
     }
     else
     {
     	n=r1;
+
     	if (n == 1)
-    	        return a[0][0];
+    	{
+    	        D=a[0][0];
+    	        return(D);
+    	}
+    	else
+    	{
 
-    	    int temp[n][n]; // To store cofactors
+    	  D=0;
 
-    	    int sign = 1; // To store sign multiplier
+
 
     	    // Iterate for each element of first row
     	    for (int f = 0; f < n; f++)
     	    {
-    	        // Getting Cofactor of mat[0][f]
-    	        getCofactor(a, temp, 0, f, n);
-    	        D += sign * a[0][f]
-    	             * matrix_det(temp, n - 1);
 
-    	        // terms are to be added with alternate sign
-    	        sign = -sign;
-    	    }
+    	        // Getting Cofactor of a[0][f]
 
-    	    //display  D;
-    }
 
-}
+                temp= malloc(2*sizeof*temp);
 
-void getCofactor(int mat[N][N], int temp[N][N], int p,
-                 int q, int n)
-{
-    int i = 0, j = 0;
-
+      for (i=0; i< 2; i++)
+      {
+    	  temp[i]= malloc(2*sizeof*temp[i]);
+      }
+i=0;
     // Looping for each element of the matrix
     for (int row = 0; row < n; row++)
     {
@@ -217,31 +322,91 @@ void getCofactor(int mat[N][N], int temp[N][N], int p,
             //  Copying into temporary matrix only those
             //  element which are not in given row and
             //  column
-            if (row != p && col != q)
+
+            if (row != 0 && col != f)
             {
-                temp[i][j++] = mat[row][col];
+                temp[i][j++] = a[row][col];
 
                 // Row is filled, so increase row index and
                 // reset col index
                 if (j == n - 1)
                 {
                     j = 0;
+
                     i++;
                 }
             }
         }
     }
+
+
+                if(f%2==0)
+                {
+
+    	       ( D +=  a[0][f]
+    	             *(matrix_det(temp, n - 1,n - 1)));
+                }
+                else
+                {
+
+                    D -=  a[0][f]
+    	             *(matrix_det(temp, n - 1,n - 1));
+                }
+    	        // terms are to be added with alternate sign
+
+    	        D1=D;
+
+    	    }
+
+
+
+
+    }
+
+    }
+	return D1;
+
 }
 
+/**
+ * @brief Calculates transpose of a matrix
+ *
+ * @param a is the  matrix whose transpose is calculated
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+
+ */
+void matrix_transpose(int **a, int r1, int c1)
+{
+
+		int i,j;
+		int res[r1][c1];
+
+		for (i=0; i<c1;i++)
+		{
+			for (j=0;j<r1;j++)
+			{
+				res[i][j]= a[j][i];
+			}
+		}
+		for (i=0;i<c1;i++)
+		{
+			for(j=0;j<r1;j++)
+				{
+					printf("yes");
+				}
+		}
+	}
+
 /////////////////////////////////////////////////////////////////////////////////////
-void *DISP_VAL;// variable to store value to be displayed on lcd
-int *RD_VAL;
-#define N=100;
+
+
 int main()
 { 
   int ROW1, ROW2, COL1, COL2;
   int **A;
   int **B ;
+  int Determinant_A,Determinant_B;
 
   char OP_SEL; //can be converted to integer
 
@@ -250,25 +415,23 @@ int main()
   while(1)
   {
 	  //reading row and column size for matrix A and B
-       RD_VAL=(int *)0x00011010; // base address need to be changed for every read operation?
-      ROW1=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
-      COL1=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
-      ROW2=*RD_VAL;
-      RD_VAL=(int *)0x00011010;
-      COL2=*RD_VAL;
+	  // Read the row, column size of matrix 1 and matrix 2 from the FPGA PIO layer.
+      ROW1= decode_ascii();
+      COL1=decode_ascii();
+
+      ROW2=decode_ascii();
+      COL2=decode_ascii();
 
       //reading values into matrix A and B
       //allocating memory
       A= malloc(ROW1*sizeof*A);
-      for (i=0; i< ROWS1; i++)
+      for (i=0; i< ROW1; i++)
       {
     	  A[i]= malloc(COL1*sizeof*A[i]);
       }
 
       B= malloc(ROW2*sizeof*B);
-            for (i=0; i< ROWS2; i++)
+            for (i=0; i< ROW2; i++)
             {
           	  B[i]= malloc(COL2*sizeof*B[i]);
             }
@@ -277,21 +440,24 @@ int main()
       {
     	  for(j=0;j<COL1;j++)
     	  {
-    		  RD_VAL=(int *)0x00011010; //is this going to work?
-    		  A[i][j]=*RD_VAL;
+
+    		  RD_VAL=
+    		  NEXT_NUM_FROM_PIO();
+    		  A[i][j]=RD_VAL;
     	  }
       }
       for (i=0;i<ROW2; i++)
             {
          	  for(j=0;j<COL2;j++)
          	  {
-         		  RD_VAL=(int *)0x00011010;
-         		  B[i][j]=*RD_VAL;
+         		  RD_VAL=READ_INPUT_FROM_PIO();
+         		  NEXT_NUM_FROM_PIO();
+         		  B[i][j]=RD_VAL;
          	  }
            }
        //selecting operator
       RD_VAL=(char *)0x00011010;
-      OP_SEL=*RD_VAL;
+      OP_SEL=RD_VAL;
 
     switch (OP_SEL){
     case '+':
@@ -304,9 +470,13 @@ int main()
     	matrix_mul(A,B,ROW1,COL1, ROW2,COL2);
     	break;
     case 'd':
-    	matrix_det(A,ROW1,COL1);
-    	matrix_det(B,ROW1,COL1);
+    	Determinant_A=matrix_det(A,ROW1,COL1);
+    	Determinant_B=matrix_det(B,ROW1,COL1);
     	break;
+    case 't':
+        matrix_transpose(A,ROW1,COL1);
+        break;
+
     default:
     	break;
 
