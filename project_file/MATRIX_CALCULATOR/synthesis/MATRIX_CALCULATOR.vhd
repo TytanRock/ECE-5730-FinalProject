@@ -6,7 +6,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity MATRIX_CALCULATOR is
+entity MATRIX_CALCULATOR_sys is
 	port (
 		clk_clk                                 : in  std_logic                    := '0';             --                              clk.clk
 		nextval_external_connection_export      : out std_logic_vector(7 downto 0);                    --      nextval_external_connection.export
@@ -14,9 +14,9 @@ entity MATRIX_CALCULATOR is
 		readval_external_connection_export      : in  std_logic_vector(7 downto 0) := (others => '0'); --      readval_external_connection.export
 		writeval_external_connection_export     : out std_logic_vector(7 downto 0)                     --     writeval_external_connection.export
 	);
-end entity MATRIX_CALCULATOR;
+end entity MATRIX_CALCULATOR_sys;
 
-architecture rtl of MATRIX_CALCULATOR is
+architecture rtl of MATRIX_CALCULATOR_sys is
 	component MATRIX_CALCULATOR_jtag_uart_0 is
 		port (
 			clk            : in  std_logic                     := 'X';             -- clk
