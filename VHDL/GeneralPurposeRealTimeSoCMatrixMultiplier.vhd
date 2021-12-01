@@ -6,16 +6,19 @@ ENTITY GeneralPurposeRealTimeSoCMatrixMultiplier IS
           SW        : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
 			 UART_RX : IN STD_LOGIC; 
 			 UART_TX : OUT STD_LOGIC; 
+          KEY       : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
           LEDR      : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
 		);
 END GeneralPurposeRealTimeSoCMatrixMultiplier;
 
 ARCHITECTURE Behavior OF GeneralPurposeRealTimeSoCMatrixMultiplier IS
-
+    SIGNAL Decoded : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL ToSend  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL GotUart : STD_LOGIC;
 BEGIN
-
-	UART_TX <= UART_RX;
-    
-    decoder : entity work.Uart_Decoder port map (CLOCK_50, UART_RX, LEDR(9), LEDR(7 DOWNTO 0));
+    decoder : entity work.Uart_Decoder port map (CLOCK_50, UART_RX, GotUart, Decoded);
+    fifo    : entity work.FIFO port map (GotUart, Decoded, KEY(0), ToSend);
+    transmitter : entity work.Uart_Transmitter port map (CLOCK_50, KEY(1), ToSend, UART_TX);
+    LEDR(7 DOWNTO 0) <= ToSend;
 
 END Behavior;

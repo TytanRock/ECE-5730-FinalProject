@@ -85,11 +85,18 @@
 #define PIO_INPUT_ADDR (0x00011010)// PIO width is chosen as 32 bit wide
 #define PIO_NEXT_NUM_ADDR (0x00011000)
 #define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_BASE_ADDR)
-#define NEXT_NUM_FROM_PIO() (*(volatile int *)PIO_NEXT_NUM_ADDR) = 1
 #define PIO_OUTPUT_ADDR //write address
 #define WRITE_OUTPUT_TO_PIO() ((*volatile int)PIO_OUTPUT_ADDR) //correct declaration or not ?
 int DISP_VAL;// variable to store value to be displayed on lcd
 int RD_VAL;
+
+void Next_Read_Pio()
+{
+	(*(volatile int *)PIO_NEXT_NUM_ADDR) = 0;
+	(*(volatile int *)PIO_NEXT_NUM_ADDR) = 1;
+}
+
+void 
 
 int decode_ascii() {
 	int retval = 0;
@@ -139,12 +146,24 @@ void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
 				for(j=0;j<c1;j++)
 				{
 					//using lcd as output
-					WRITE_OUTPUT_TO_PIO()=res[i][j];
+					char tmp[200];
+					sprintf("%d", res[i][j]);
+					printToComputer(tmp, sizeof(tmp));
 				}
 		
 	}
 
 }
+
+void printToComputer(char *str, int len)
+{
+	int i;
+	for(i=0;i<len;i++)
+	{
+		WRITE_OUTPUT_TO_PIO =str[i];
+	}
+}
+
 /**
  * @brief  performs matrix subtraction
  * 
@@ -174,6 +193,7 @@ void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
 			}
 		}
 	}
+
 
 	for (i=0;i<r1;i++)
 			{
