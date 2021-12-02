@@ -6,7 +6,7 @@ JedecChain;
 	P ActionCode(Ign)
 		Device PartName(SOCVHPS) MfrSpec(OpMask(0));
 	P ActionCode(Cfg)
-		Device PartName(5CSEMA5F31) Path("C:/intelFPGA_lite/18.1/project_file/output_files/") File("MATRIX_CALCULATOR.sof") MfrSpec(OpMask(1));
+		Device PartName(5CSEMA5F31) Path("C:/lab/PROJECT_FILES/ECE-5730-FinalProject/project_file/output_files/") File("MATRIX_CALCULATOR.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
