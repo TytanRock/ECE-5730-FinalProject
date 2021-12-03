@@ -30,16 +30,16 @@ BEGIN
     END PROCESS;
     
     PROCESS (Clk, Rx, started)
-    VARIABLE counter : Integer RANGE 0 TO (ClockRate / BaudRate) := 0;
+    VARIABLE counter : Integer RANGE 0 TO ((ClockRate*2) / BaudRate) := 0;
     BEGIN
         IF Clk = '1' AND Clk'event THEN
             IF started = '1' THEN
                 counter := counter + 1;
-                IF counter = (ClockRate / BaudRate) THEN
+                IF counter = ((ClockRate) / BaudRate) THEN
                     counter := 0;
-                ELSIF counter = (ClockRate / (BaudRate * 2)) THEN
-                    data_reg(bit_location) <= Rx;
                     bit_location <= bit_location + 1;
+                ELSIF counter = (ClockRate / (BaudRate*2)) THEN
+                    data_reg(bit_location) <= Rx;
                 END IF;
             ELSE
                 bit_location <= 0;
