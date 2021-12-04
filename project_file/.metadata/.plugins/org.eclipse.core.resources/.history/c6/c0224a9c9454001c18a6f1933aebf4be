@@ -1,0 +1,630 @@
+/* 
+ * "Small Hello World" example. 
+ * 
+ * This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
+ * the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example 
+ * designs. It requires a STDOUT  device in your system's hardware. 
+ *
+ * The purpose of this example is to demonstrate the smallest possible Hello 
+ * World application, using the Nios II HAL library.  The memory footprint
+ * of this hosted application is ~332 bytes by default using the standard 
+ * reference design.  For a more fully featured Hello World application
+ * example, see the example titled "Hello World".
+ *
+ * The memory footprint of this example has been reduced by making the
+ * following changes to the normal "Hello World" example.
+ * Check in the Nios II Software Developers Manual for a more complete 
+ * description.
+ * 
+ * In the SW Application project (small_hello_world):
+ *
+ *  - In the C/C++ Build page
+ * 
+ *    - Set the Optimization Level to -Os
+ * 
+ * In System Library project (small_hello_world_syslib):
+ *  - In the C/C++ Build page
+ * 
+ *    - Set the Optimization Level to -Os
+ * 
+ *    - Define the preprocessor option ALT_NO_INSTRUCTION_EMULATION 
+ *      This removes software exception handling, which means that you cannot 
+ *      run code compiled for Nios II cpu with a hardware multiplier on a core 
+ *      without a the multiply unit. Check the Nios II Software Developers 
+ *      Manual for more details.
+ *
+ *  - In the System Library page:
+ *    - Set Periodic system timer and Timestamp timer to none
+ *      This prevents the automatic inclusion of the timer driver.
+ *
+ *    - Set Max file descriptors to 4
+ *      This reduces the size of the file handle pool.
+ *
+ *    - Check Main function does not exit
+ *    - Uncheck Clean exit (flush buffers)
+ *      This removes the unneeded call to exit when main returns, since it
+ *      won't.
+ *
+ *    - Check Don't use C++
+ *      This builds without the C++ support code.
+ *
+ *    - Check Small C library
+ *      This uses a reduced functionality C library, which lacks  
+ *      support for buffering, file IO, floating point and getch(), etc. 
+ *      Check the Nios II Software Developers Manual for a complete list.
+ *
+ *    - Check Reduced device drivers
+ *      This uses reduced functionality drivers if they're available. For the
+ *      standard design this means you get polled UART and JTAG UART drivers,
+ *      no support for the LCD driver and you lose the ability to program 
+ *      CFI compliant flash devices.
+ *
+ *    - Check Access device drivers directly
+ *      This bypasses the device file system to access device drivers directly.
+ *      This eliminates the space required for the device file system services.
+ *      It also provides a HAL version of libc services that access the drivers
+ *      directly, further reducing space. Only a limited number of libc
+ *      functions are available in this configuration.
+ *
+ *    - Use ALT versions of stdio routines:
+ *
+ *           Function                  Description
+ *        ===============  =====================================
+ *        alt_printf       Only supports %s, %x, and %c ( < 1 Kbyte)
+ *        alt_putstr       Smaller overhead than puts with direct drivers
+ *                         Note this function doesn't add a newline.
+ *        alt_putchar      Smaller overhead than putchar with direct drivers
+ *        alt_getchar      Smaller overhead than getchar with direct drivers
+ *
+ */
+
+#include "sys/alt_stdio.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "math.h"
+#include "stdint.h"
+#include "io.h"
+#include "altera_avalon_pio_regs.h"
+
+//
+//#define PIO_INPUT_ADDR (0x00021030)// PIO width is chosen as 32 bit wide
+//#define PIO_NEXT_NUM_ADDR (0x00021020)
+//#define READ_INPUT_FROM_PIO() (*(volatile int *)PIO_INPUT_ADDR)
+#define PIO_OUTPUT_ADDR (0x00021010)
+#define PIO_WRITE_NEXT (0X00021000)
+#define WRITE_OUTPUT_TO_PIO() (*(volatile int*)PIO_OUTPUT_ADDR)
+#define WRITE_NEXT_OUTPUT() (*(volatile int*)PIO_WRITE_NEXT)
+
+void next_from_pio()
+{
+	uint8_t *next;
+	//uint8_t next;
+	next = (uint8_t *)0x00021020;
+//next = IORD_ALTERA_AVALON_PIO_DATA(0x00021020);
+	*next = 0;
+	printf("inside next_pio\n");
+	for(volatile uint32_t i=0; i<500000;i++);
+	*next = 1;
+	for(volatile uint32_t i=0; i<500000;i++);
+}
+
+/*
+void display (char s)
+{
+	WRITE_OUTPUT_TO_PIO()=s;//is it dereferenced or is it  a pointer?
+	WRITE_NEXT_OUTPUT()=0;
+			WRITE_NEXT_OUTPUT()=1;
+}*/
+int decode_ascii() {
+	printf("step1\n");
+	int retval = 0;
+
+//	volatile char *value;
+//	//volatile char value;
+//	*value = (char *)0x00021030;
+	//*value = IORD_ALTERA_AVALON_PIO_DATA(0x00021030);
+	while(1) {
+		char value = IORD_ALTERA_AVALON_PIO_DATA(0x00021030);
+		printf("%c\n", value);
+		if(value == ',') break;
+		if(value >= '0' && value <= '9')
+		{
+			retval *= 10;
+			retval += value-'0';
+		}
+		next_from_pio();
+
+	}
+	printf("step2\n");
+	return retval;
+}
+/*
+/**
+ * @brief Adds to matrices together
+ *
+ * @param a First matrix to add
+ * @param b Second matrix to add
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
+/*
+void matrix_add(int** a, int** b, int r1, int c1, int r2, int c2)
+{
+	int i,j,k,l;
+	int res[r1][c1];
+
+	if (r1 != r2 || c2 != c1)
+	{
+
+		char s[100];
+        char disp[]="Cannot be added";
+
+							    sprintf(s,"%s",disp);
+							    for (int index=0; s[index]!='\0';index++)
+							    {
+							    display(s[index]);
+							    }
+	}
+	else
+	{
+		for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+			{
+				res[i][j]= a[i][j] + b[i][j];
+			}
+		}
+	}
+
+	for (i=0;i<r1;i++)
+			{
+				for(j=0;j<c1;j++)
+				{
+
+					char s[100];
+
+
+					    sprintf(s,"%d\t",res[i][j]);
+					    for (int index=0; s[index]!='\0';index++)
+					    {
+					    display(s[index]);
+					    }
+				}
+          char new_line='\n';
+          display(new_line);
+	}
+
+}
+/**
+ * @brief  performs matrix subtraction
+ *
+ * @param a First matrix
+ * @param b Second matrix
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ *//*
+void matrix_sub(int** a, int** b, int r1, int c1, int r2, int c2)
+{
+	int i,j,k,l;
+	int res[r1][c1];
+
+	if (r1 != r2 || c2 != c1)
+	{
+		char s[100];
+		        char disp[]="Cannot be subtracted";
+
+									    sprintf(s,"%s",disp);
+									    for (int index=0; s[index]!='\0';index++)
+									    {
+									    display(s[index]);
+									    }
+
+	}
+	else
+	{
+		for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+			{
+				res[i][j]= a[i][j] - b[i][j];
+			}
+		}
+	}
+
+	for (i=0;i<r1;i++)
+				{
+					for(j=0;j<c1;j++)
+					{
+
+						char s[100];
+
+
+											    sprintf(s,"%d",res[i][j]);
+											    for (int index=0; s[index]!='\0';index++)
+											    {
+											    display(s[index]);
+											    }
+					}
+
+		}
+	for (i=0;i<r1;i++)
+	{
+		for(j=0;j<c1;j++)
+		{
+
+			char s[100];
+
+
+								    sprintf(s,"%d",res[i][j]);
+								    for (int index=0; s[index]!='\0';index++)
+								    {
+								    display(s[index]);
+								    }
+		}
+		char new_line='\n';
+		          display(new_line);
+
+}
+
+
+}
+
+/**
+ * @brief Multiplies two matrices together
+ *
+ * @param a First matrix
+ * @param b Second matrix
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+ * @param r2 Number of rows in b
+ * @param c2 Number of columns in b
+ */
+/*
+void matrix_mul(int** a, int** b, int r1, int c1, int r2, int c2)
+
+{
+	int i,j,k,l,m;
+	int res[r1][c2];
+	if(c1 != r2)
+	{
+
+		char s[100];
+				        char disp[]="Cannot be multiplied";
+
+				        sprintf(s,"%s",disp);
+					    for (int index=0; s[index]!='\0';index++)
+
+							  {display(s[index]);}
+
+	}
+	else
+	{
+		for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c2;j++)
+			{
+				res[i][j]=0;
+				for(m=0;m<c1;m++)
+				{
+					res[i][j]=res[i][j]+ (a[i][m] * b[m][j]);
+				}
+			}
+
+		}
+	}
+
+	for (i=0;i<r1;i++)
+				{
+					for(j=0;j<c2;j++)
+					{
+
+						char s[100];
+
+
+						 sprintf(s,"%d",res[i][j]);
+						for (int index=0; s[index]!='\0';index++)
+						{
+						display(s[index]);
+						 }
+					}
+					char new_line='\n';
+					          display(new_line);
+
+		}
+
+}
+//scalar multiplication
+void scalar_matrix_mul (int **a, int r1, int c1)
+{
+	int i,j;
+	int k;
+	int res[r1][c1];
+
+	for (i=0; i<r1; i++)
+	{
+		for (j=0;j<c1;j++)
+		{
+			res[i][j]=k*a[i][j];
+		}
+	}
+	for (i=0;i<r1;i++)
+		{
+			for(j=0;j<c1;j++)
+				{
+				char s[100];
+
+
+				 sprintf(s,"%d",res[i][j]);
+				for (int index=0; s[index]!='\0';index++)
+				{
+					display(s[index]);
+				 }
+				}
+			char new_line='\n';
+			          display(new_line);
+		}}
+/**
+ * @brief Calculates determinant of a matrix
+ *
+ * @param a First matrix whose determinant is calculated
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+
+ */
+/*
+ int matrix_det(int** a, int r1, int c1)
+{
+    int D ;
+    int D1;
+ int n;
+ int **temp;
+ int i,j=0;
+ int sign = 1;
+
+    //  Base case : if matrix contains single element
+    if(r1!=c1)
+    {
+     //not possible to find determinant
+    	char s[100];
+    					        char disp[]="Not possible";
+
+    					        sprintf(s,"%s",disp);
+    						    for (int index=0; s[index]!='\0';index++)
+
+    								  {display(s[index]);}
+    }
+    else
+    {
+    	n=r1;
+
+    	if (n == 1)
+    	{
+    	        D=a[0][0];
+    	        return(D);
+    	}
+    	else
+    	{
+
+    	  D=0;
+
+
+
+    	    // Iterate for each element of first row
+    	    for (int f = 0; f < n; f++)
+    	    {
+
+    	        // Getting Cofactor of a[0][f]
+
+
+                temp= malloc(2*sizeof*temp);
+
+      for (i=0; i< n; i++)
+      {
+    	  temp[i]= malloc(2*sizeof*temp[i]);
+      }
+i=0;
+    // Looping for each element of the matrix
+    for (int row = 0; row < n; row++)
+    {
+        for (int col = 0; col < n; col++)
+        {
+            //  Copying into temporary matrix only those
+            //  element which are not in given row and
+            //  column
+
+            if (row != 0 && col != f)
+            {
+                temp[i][j++] = a[row][col];
+
+                // Row is filled, so increase row index and
+                // reset col index
+                if (j == n - 1)
+                {
+                    j = 0;
+
+                    i++;
+                }
+            }
+        }
+    }
+
+
+                if(f%2==0)
+                {
+
+    	       ( D +=  a[0][f]
+    	             *(matrix_det(temp, n - 1,n - 1)));
+                }
+                else
+                {
+
+                    D -=  a[0][f]
+    	             *(matrix_det(temp, n - 1,n - 1));
+                }
+    	        // terms are to be added with alternate sign
+
+    	        D1=D;
+
+    	    }
+
+
+
+
+    }
+
+    }
+	return D1;
+
+}
+
+/**
+ * @brief Calculates transpose of a matrix
+ *
+ * @param a is the  matrix whose transpose is calculated
+ * @param r1 Number of rows in a
+ * @param c1 Number of columns in a
+
+ *//*
+void matrix_transpose(int **a, int r1, int c1)
+{
+
+		int i,j;
+		int res[r1][c1];
+
+		for (i=0; i<c1;i++)
+		{
+			for (j=0;j<r1;j++)
+			{
+				res[i][j]= a[j][i];
+			}
+		}
+		for (i=0;i<c1;i++)
+		{
+			for(j=0;j<r1;j++)
+				{
+				char s[100];
+
+
+				sprintf(s,"%d",res[i][j]);
+				for (int index=0; s[index]!='\0';index++)
+				{
+				display(s[index]);
+				}
+				}
+			char new_line='\n';
+			          display(new_line);
+		}
+	}
+
+/*......Main Program ........*/
+
+int main()
+{ 
+
+  int ROW1, ROW2, COL1, COL2;
+  int **A;
+  int **B ;
+  int Determinant_A,Determinant_B;
+
+  int OP_SEL;
+  char str[100];
+
+  int i,j,k;
+
+ printf("entered main\n");
+  //while(1)
+  //{
+	  //reading row and column size for matrix A and B
+	  // Read the row, column size of matrix 1 and matrix 2 from the FPGA PIO layer.
+      ROW1= decode_ascii();
+      COL1=decode_ascii();
+
+      ROW2=decode_ascii();
+      COL2=decode_ascii();
+printf("%d\n",ROW1);
+      //reading values into matrix A and B
+      //allocating memory
+      A= malloc(ROW1*sizeof*A);
+      for (i=0; i< ROW1; i++)
+      {
+    	  A[i]= malloc(COL1*sizeof*A[i]);
+      }
+
+      B= malloc(ROW2*sizeof*B);
+            for (i=0; i< ROW2; i++)
+            {
+          	  B[i]= malloc(COL2*sizeof*B[i]);
+            }
+
+      for (i=0;i<ROW1; i++)
+      {
+    	  for(j=0;j<COL1;j++)
+    	  {
+
+
+    		  A[i][j]=decode_ascii();
+    	  }
+      }
+      for (i=0;i<ROW2; i++)
+            {
+         	  for(j=0;j<COL2;j++)
+         	  {
+
+         		  B[i][j]=decode_ascii();
+         	  }
+           }
+      printf("%d\n",A[0][0]);
+      printf("%d\n",A[ROW1-1][0]);
+      printf("%d\n",ROW1);
+      printf("%d\n",COL1);
+       //selecting operator
+
+      //OP_SEL=decode_ascii();
+
+/*
+    switch (OP_SEL){
+    case '1':
+    	matrix_add(A,B,ROW1,COL1, ROW2,COL2);
+    	break;
+    case '2':
+    	matrix_sub(A,B,ROW1,COL1, ROW2,COL2);
+    	break;
+    case '3':
+    	matrix_mul(A,B,ROW1,COL1, ROW2,COL2);
+    	break;
+    case '4':
+    	Determinant_A=matrix_det(A,ROW1,COL1);
+    	char s[100];
+    	sprintf(s,"%d",Determinant_A);
+
+    	for (int index=0; s[index]!='\0';index++)
+    	{
+    		display(s[index]);
+    	}
+    	Determinant_B=matrix_det(B,ROW2,COL2);
+
+    	    	sprintf(str,"%d",Determinant_B);
+
+    	    	for (int index=0; str[index]!='\0';index++)
+    	    	{
+    	    		display(str[index]);
+    	    	}
+    	break;
+    case '5':
+        matrix_transpose(A,ROW1,COL1);
+        break;
+
+    default:
+    	break;
+
+  }
+  }*/
+
+  free(A);
+  free(B);
+   return 0;
+}
