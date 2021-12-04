@@ -37,7 +37,7 @@ BEGIN
                 IF counter = ((ClockRate) / BaudRate) THEN
                     counter := 0;
                     bit_location <= bit_location + 1;
-                ELSIF counter = (ClockRate / (BaudRate*2)) THEN                    
+                ELSIF counter = 2 THEN                    
                     -- Send the start bit
                     IF(bit_location = 0) THEN
                         Tx <= '0';

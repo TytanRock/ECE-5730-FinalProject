@@ -6,7 +6,7 @@ JedecChain;
 	P ActionCode(Ign)
 		Device PartName(SOCVHPS) MfrSpec(OpMask(0));
 	P ActionCode(Cfg)
-		Device PartName(5CSEMA5F31) Path("/home/cory/Documents/ECE-5730/ECE-5730-FinalProject/VHDL/output_files/") File("GeneralPurposeRealTimeSoCMatrixMultiplier.sof") MfrSpec(OpMask(1));
+		Device PartName(5CSEMA5F31) Path("C:/Users/nessc/Documents/_School/ECE-5730/ECE-5730-FinalProject/VHDL/output_files/") File("GeneralPurposeRealTimeSoCMatrixMultiplier.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 

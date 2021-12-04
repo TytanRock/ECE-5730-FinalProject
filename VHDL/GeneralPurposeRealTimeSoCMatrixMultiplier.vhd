@@ -17,7 +17,7 @@ ARCHITECTURE Behavior OF GeneralPurposeRealTimeSoCMatrixMultiplier IS
     SIGNAL GotUart : STD_LOGIC;
 BEGIN
     decoder : entity work.Uart_Decoder generic map (9600, 50_000_000) port map (CLOCK_50, UART_RX, GotUart, Decoded);
-    fifo    : entity work.FIFO port map (GotUart, Decoded, KEY(0), ToSend);
+    fifo    : entity work.FIFO generic map (128) port map (GotUart, Decoded, KEY(0), NOT KEY(2), ToSend);
     transmitter : entity work.Uart_Transmitter generic map (9600, 50_000_000) port map (CLOCK_50, KEY(1), ToSend, UART_TX);
     LEDR(7 DOWNTO 0) <= ToSend;
 
