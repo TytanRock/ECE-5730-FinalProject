@@ -185,7 +185,7 @@ int main()
       OP_SEL=decode_ascii();
       switch(OP_SEL){
       case 1:
-    	  sprintf(str,"\n sum is : %d",(ROW1+COL1));
+    	  sprintf(str,"sum is : %d",(ROW1+COL1));
     	  printf("%s",str);
     	  writeString(str,sizeof(str));
     	  break;
