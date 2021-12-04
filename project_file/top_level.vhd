@@ -10,6 +10,7 @@ entity MATRIX_CALCULATOR is
 	port (
 		CLOCK_50                                 : in  std_logic                    := '0';             --                              clk.clk
 		UART_RX                                  : in std_logic;
+        SW                                       : in std_logic_vector(9 downto 0);
         UART_TX                                  : out std_logic;
         LEDR                                     : out std_logic_vector(9 downto 0)
 	);
@@ -41,7 +42,7 @@ begin
     
     uart_decoder : entity work.Uart_Decoder port map (CLOCK_50, UART_RX, gotUart, decodedRead);
     
-    read_fifo : entity work.FIFO port map (gotUart, decodedRead, next_read(0), toRead);
+    read_fifo : entity work.FIFO port map (gotUart, decodedRead, next_read(0), SW(0), toRead);
     
     LEDR(7 downto 0) <= toRead;
     
