@@ -48,18 +48,20 @@ begin
             if pop'event and pop = '1' then
                 if not (newStart = stop) then 
                     stop <= stop + 1;
-                    if(stop = num - 1) then
-                        toSend := mem(0);
-                    else
-                        toSend := mem(stop + 1);
-                    end if;
-                else
-                    toSend := "00000000";
                 end if;
             end if;
         end if;
         
-        data_out <= toSend;
+    if not (start = stop) then
+        if(stop = num - 1) then
+            toSend := mem(0);
+        else
+            toSend := mem(stop + 1);
+        end if;
+    else
+        toSend := "00000000";
+    end if;
+    data_out <= toSend;
     end process;
 end;
  
