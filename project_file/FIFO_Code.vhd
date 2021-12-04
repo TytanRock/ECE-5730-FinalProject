@@ -44,7 +44,7 @@ begin
             --assuming pop as a 1 bit input
             --first value from the queue is stored into data_out object
             --queue is updated
-            newStart := start - 1;
+            newStart := start;
             if pop'event and pop = '1' then
                 if not (newStart = stop) then 
                     stop <= stop + 1;
@@ -52,6 +52,7 @@ begin
             end if;
         end if;
         
+    -- Get the current head of the ring buffer if we're not empty
     if not (start = stop) then
         if(stop = num - 1) then
             toSend := mem(0);
@@ -61,6 +62,7 @@ begin
     else
         toSend := "00000000";
     end if;
+    
     data_out <= toSend;
     end process;
 end;

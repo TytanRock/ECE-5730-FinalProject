@@ -42,7 +42,9 @@ begin
     
     uart_decoder : entity work.Uart_Decoder port map (CLOCK_50, UART_RX, gotUart, decodedRead);
     
-    read_fifo : entity work.FIFO port map (gotUart, decodedRead, next_read(0), SW(0), toRead);
+    uart_transmitter : entity work.Uart_Transmitter port map (CLOCK_50, next_write(0), toWrite, UART_TX);
+    
+    read_fifo : entity work.FIFO generic map (128) port map (gotUart, decodedRead, next_read(0), SW(0), toRead);
     
     LEDR(7 downto 0) <= toRead;
     
