@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity FIFO is
-    generic (num : in integer := 32);
+    generic (num : in integer := 128);
     port (  complete : in std_logic;
             data_in : in std_logic_vector(7 downto 0);
             pop, clear : in std_logic;
